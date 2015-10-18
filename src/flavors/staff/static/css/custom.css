@@ -130,14 +130,14 @@ a.reply-link.btn.btn-small {
 }
 
 /* hide sign in */
-.or-sign-in {
+/*.or-sign-in {
   display: none;
 }
 
 #sign-in-btn {
   display: none;
 }
-
+*/
 /* =The Big Button to Add A New Point
 -------------------------------------------------------------- */
 
@@ -404,6 +404,16 @@ p.checkbox + p.select {
 }
 
 @media only screen and (min-width: 60em) {
+  .download-data-nav {
+    display: block;
+    float: right;
+    width: auto;
+    margin: -1.125em 0 0 0.5em;
+    position: relative;
+    top: 50%;
+    font-size: 0.875em;
+  }
+
   #site-title a:link,
   #site-title a:visited {
     font-size: 1em;
@@ -430,20 +440,25 @@ p.checkbox + p.select {
     background-color: #68bab9;
     color: #fff;
   }
-  .list-toggle-nav {
+  .list-toggle-nav,.download-data-nav {
     font-size: 0.75em;
     float: left;
   }
+  
   a.list-toggle-btn:visited, 
   a.list-toggle-btn:active, 
-  a.list-toggle-btn:link {
+  a.list-toggle-btn:link,
+  a.download-data-btn:visited, 
+  a.download-data-btn:active, 
+  a.download-data-btn:link
+  {
     background-color: #fff;
     color: #e28623;
     text-shadow: none;
     box-shadow: none;
     border: 0;
   }
-  a.list-toggle-btn:hover {
+  a.download-data-btn:hover, a.list-toggle-btn:hover {
     background-color: #68bab9;
     color: #fff;
   }
@@ -454,6 +469,7 @@ p.checkbox + p.select {
 
 @media only screen and (min-width: 70em) {
   .access,
+  .download-data-nav,
   .list-toggle-nav {
     font-size: 0.875em;
   }

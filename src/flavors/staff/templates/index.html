@@ -42,15 +42,21 @@
 <!--
   This will place content at the top of the side bar
  -->
+{% block header_menu %}
+    <nav class="download-data-nav">
+      <a href="#" class="download-data-btn btn btn-block"><span class="download-data">Download data</span></a>
+    </nav>
+{% endblock %}
+
 {% block sidebar %}
 
 <ul class="legend">
-  <li class="clearfix"><img src="/static/css/images/markers/new/facilities-small.png" width="25" height="30"> {% trans 'Culture and Community Facilities' %}</li>
+  <li class="clearfix"><img src="/static/css/images/markers/new/facilities-small.png" width="25" height="30"> {% trans 'Culture &amp; Community Facilities' %}</li>
   <li class="clearfix"><img src="/static/css/images/markers/new/education-small.png" width="25" height="30"> {% trans 'Education' %}</li>
   <li class="clearfix"><img src="/static/css/images/markers/new/tree-small.png" width="25" height="30"> {% trans 'Environment' %}</li>
-  <li class="clearfix"><img src="/static/css/images/markers/new/playground-small.png" width="25" height="30"> {% trans 'Parks and Recreation' %}</li>
-  <li class="clearfix"><img src="/static/css/images/markers/new/health-small.png" width="25" height="30"> {% trans 'Public Health and Safety' %}</li>
-  <li class="clearfix"><img src="/static/css/images/markers/new/street-sidewalk-small.png" width="25" height="30"> {% trans 'Streets and Sidewalks' %}</li>
+  <li class="clearfix"><img src="/static/css/images/markers/new/playground-small.png" width="25" height="30"> {% trans 'Parks &amp; Recreation' %}</li>
+  <li class="clearfix"><img src="/static/css/images/markers/new/health-small.png" width="25" height="30"> {% trans 'Public Health &amp; Safety' %}</li>
+  <li class="clearfix"><img src="/static/css/images/markers/new/street-sidewalk-small.png" width="25" height="30"> {% trans 'Streets &amp; Sidewalks' %}</li>
 </ul>
 {% endblock %}
 
@@ -89,8 +95,66 @@ Shareabouts.PlaceFormView.prototype.setLocation = function(locationData) {
   $approxAddress.html('<span class="address-label">Approximate location:</span> ' + Handlebars.templates['location-string'](locationData));
 }
     $(Shareabouts).on('panelshow', function(evt, app, path) {
-    var input = document.getElementById("place-source").focus();
+      var placeSource = document.getElementById("place-source");
+      $(placeSource).focus();
     });
+
+  $(function() {
+    var $downloadBtn = $('.download-data-btn');
+
+    $downloadBtn.on('click', function(evt) {
+      evt.preventDefault();
+      $downloadBtn.prop('disabled', true);
+
+      // Request a new snapshot from the server
+      var places = window.app.collection;
+      var snapshotUrl = places.url + '/snapshots';
+      $.ajax({
+        url: snapshotUrl,
+        data: {'new': true, 'include_private': true},
+
+        // If we get a 401 or 403 error, it means the user doesn't have
+        // permission to download private data. Let them know they need
+        // to log in.
+        error: function($xhr, status, error) {
+          if ($xhr.status === 401 || $xhr.status === 403) {
+            alert('You must log in as a user that can download the data.');
+          } else {
+            alert('Oops! An error occurred while requesting a new download. Please try again in a few minutes.');
+          }
+          $downloadBtn.prop('disabled', false);
+        },
+
+        // If we get back a data URL, poll that URL until you no longer
+        // get 503 (not ready) responses.
+        success: function(data, status, $xhr) {
+          var dataUrl = data;
+
+          // Create a function to check whether the snapshot is ready.
+          var requestSnapshotData = function() {
+            $.ajax({
+              url: dataUrl,
+              method: 'HEAD',
+
+              // If the snapshot's not ready, try again.
+              error: function($xhr, status, error) {
+                if ($xhr.status === 503) {
+                  setTimeout(requestSnapshotData, 1000);
+                }
+              },
+              
+              // If it is ready, start the download.
+              success: function(data, status, $xhr) {
+                window.location = dataUrl + '.csv';
+              }
+            });
+          };
+
+          requestSnapshotData();
+        }
+      });
+    });
+  });
 
 </script>
 

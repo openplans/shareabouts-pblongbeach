@@ -38,7 +38,7 @@ map:
 
 place_types:
 
-# Icons for previous winners and current submissions
+  # Icons for previous winners and current submissions
   culture:
     label: _(Culture & Community Facilities)
     rules:
